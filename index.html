@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Okta Q4 FY2026 決算分析レポート</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0F1419;
+    --card: #151C23;
+    --card2: #1A2332;
+    --green: #00C896;
+    --green2: #00A878;
+    --red: #FF4D6A;
+    --yellow: #FFB800;
+    --blue: #4DA6FF;
+    --gray: #8899AA;
+    --white: #E8EFF7;
+    --border: #1E2E40;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--white); font-family: 'Noto Sans JP', sans-serif; min-height: 100vh; }
+
+  .header {
+    background: linear-gradient(135deg, #0D1B2A 0%, #162030 50%, #0F1A28 100%);
+    padding: 32px;
+    border-bottom: 1px solid var(--border);
+  }
+  .header-top { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px; margin-bottom: 20px; }
+  .ticker-badge { background: #0070E0; color: white; border-radius: 8px; padding: 6px 14px; font-weight: 900; font-size: 18px; letter-spacing: 1px; display: inline-block; }
+  .company-name { color: var(--gray); font-size: 14px; margin-left: 8px; }
+  .report-title { color: var(--white); font-size: 26px; font-weight: 700; margin-top: 8px; }
+  .report-subtitle { color: var(--gray); font-size: 13px; margin-top: 4px; }
+  .rating-box {
+    background: linear-gradient(135deg, #1A2332, #223042);
+    border: 2px solid var(--yellow);
+    border-radius: 16px;
+    padding: 18px 24px;
+    text-align: center;
+    min-width: 170px;
+  }
+  .rating-emoji { font-size: 38px; }
+  .rating-label { color: var(--yellow); font-weight: 700; font-size: 16px; margin-top: 4px; }
+  .rating-sub { color: var(--gray); font-size: 12px; margin-top: 2px; }
+  .rating-detail { color: var(--gray); font-size: 11px; margin-top: 6px; line-height: 1.6; }
+
+  .metrics-strip { display: flex; gap: 10px; flex-wrap: wrap; }
+  .metric-card {
+    background: var(--card2);
+    border-radius: 12px;
+    padding: 14px 18px;
+    flex: 1;
+    min-width: 140px;
+    border-left: 3px solid var(--green);
+  }
+  .metric-label { color: var(--gray); font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .metric-value { color: var(--white); font-size: 20px; font-weight: 700; }
+  .metric-sub { font-size: 11px; margin-top: 4px; }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    background: #0D1520;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    padding: 0 24px;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--gray);
+    padding: 12px 18px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: 'Noto Sans JP', sans-serif;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab-btn.active { color: var(--green); border-bottom-color: var(--green); font-weight: 700; }
+  .tab-btn:hover { color: var(--white); }
+
+  .content { padding: 0 32px 60px; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .section-header {
+    border-left: 4px solid var(--green);
+    padding-left: 12px;
+    margin: 32px 0 16px;
+  }
+  .section-header span { color: var(--white); font-size: 16px; font-weight: 700; }
+
+  .card { background: var(--card); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card2 { background: var(--card2); border-radius: 10px; padding: 16px 20px; }
+
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .flex-wrap { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+  .flex-1 { flex: 1; min-width: 150px; }
+
+  .beat-card {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    flex: 1;
+    min-width: 160px;
+  }
+  .beat-label { color: var(--gray); font-size: 11px; margin-bottom: 4px; }
+  .beat-actual { color: var(--white); font-size: 20px; font-weight: 700; }
+  .beat-consensus { color: var(--gray); font-size: 12px; margin-top: 2px; }
+  .beat-diff { font-size: 12px; margin-top: 4px; font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { color: var(--gray); font-size: 11px; text-align: left; padding: 6px 12px; border-bottom: 1px solid var(--border); text-transform: uppercase; letter-spacing: 0.5px; }
+  td { padding: 10px 12px; border-bottom: 1px solid #131E2A; }
+
+  .val-card {
+    flex: 1; min-width: 220px;
+    border-radius: 16px;
+    padding: 24px;
+    position: relative;
+  }
+  .val-label { font-size: 12px; font-weight: 700; margin-bottom: 16px; text-transform: uppercase; }
+  .val-target { font-size: 42px; font-weight: 900; margin-bottom: 4px; color: var(--white); }
+  .val-judgment { font-size: 14px; font-weight: 700; margin-bottom: 16px; }
+  .val-divider { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 14px; }
+  .val-row { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .val-row-label { color: var(--gray); font-size: 12px; }
+  .val-row-value { color: var(--white); font-size: 12px; font-weight: 600; }
+  .val-note { font-size: 10px; color: var(--gray); margin-top: 10px; line-height: 1.5; }
+  .val-badge {
+    position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+    background: var(--blue); color: white; font-size: 10px; font-weight: 700;
+    border-radius: 4px; padding: 3px 10px; white-space: nowrap;
+  }
+
+  .comment-item {
+    background: var(--card2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 10px;
+  }
+  .comment-tags { display: flex; gap: 8px; margin-bottom: 6px; align-items: center; }
+  .tag { font-size: 11px; border-radius: 4px; padding: 2px 8px; }
+  .speaker { color: var(--gray); font-size: 12px; }
+  .comment-text { color: var(--white); font-size: 12px; line-height: 1.7; }
+
+  .risk-item { display: flex; gap: 8px; margin-bottom: 8px; font-size: 12px; color: var(--gray); }
+  .risk-bullet { flex-shrink: 0; }
+
+  .info-box {
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-top: 12px;
+    font-size: 12px;
+    line-height: 1.7;
+  }
+
+  .kpi-circle-container { display: flex; align-items: center; gap: 24px; flex-wrap: wrap; }
+  .kpi-circle-wrap { text-align: center; }
+
+  .per-row { display: flex; gap: 12px; flex-wrap: wrap; }
+  .per-item { flex: 1; min-width: 130px; background: var(--card2); border-radius: 8px; padding: 12px 16px; text-align: center; }
+  .per-label { color: var(--gray); font-size: 11px; margin-bottom: 4px; }
+  .per-value { font-weight: 800; font-size: 22px; }
+
+  canvas { max-height: 220px !important; }
+
+  .footer {
+    text-align: center;
+    padding: 24px 32px;
+    border-top: 1px solid var(--border);
+    color: var(--gray);
+    font-size: 11px;
+    line-height: 1.8;
+    margin-top: 32px;
+  }
+
+  @media (max-width: 600px) {
+    .header { padding: 20px; }
+    .content { padding: 0 16px 40px; }
+    .metrics-strip { flex-direction: column; }
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-top">
+    <div>
+      <div>
+        <span class="ticker-badge">OKTA</span>
+        <span class="company-name">Okta, Inc. ｜ NASDAQ</span>
+      </div>
+      <div class="report-title">Q4 FY2026 決算分析レポート</div>
+      <div class="report-subtitle">対象期間: 2026年1月31日終了四半期 ｜ 発表日: 2026年3月4日</div>
+    </div>
+    <div class="rating-box">
+      <div class="rating-emoji">⏸️</div>
+      <div class="rating-label">悪くない決算</div>
+      <div class="rating-sub">総合評価: 3 / 5</div>
+      <div class="rating-detail">売上・EPS共にビート<br>FY27ガイダンスが弱材料<br>cRPO予想超えはポジティブ</div>
+    </div>
+  </div>
+
+  <div class="metrics-strip">
+    <div class="metric-card" style="border-left-color:var(--green)">
+      <div class="metric-label">Q4売上高</div>
+      <div class="metric-value">$761M</div>
+      <div class="metric-sub" style="color:var(--green)">+11.6% YoY ▲ Beat +$12M</div>
+    </div>
+    <div class="metric-card" style="border-left-color:var(--green)">
+      <div class="metric-label">Non-GAAP EPS</div>
+      <div class="metric-value">$0.90</div>
+      <div class="metric-sub" style="color:var(--green)">予想$0.85 ▲ Beat +5.9%</div>
+    </div>
+    <div class="metric-card" style="border-left-color:var(--green)">
+      <div class="metric-label">cRPO</div>
+      <div class="metric-value">$2.513B</div>
+      <div class="metric-sub" style="color:var(--green)">+12% YoY ▲ 予想+9%超え</div>
+    </div>
+    <div class="metric-card" style="border-left-color:var(--green)">
+      <div class="metric-label">Non-GAAPオペマージン</div>
+      <div class="metric-value">26%</div>
+      <div class="metric-sub" style="color:var(--green)">前年比+1pp ガイド超え</div>
+    </div>
+    <div class="metric-card" style="border-left-color:var(--blue)">
+      <div class="metric-label">FCF</div>
+      <div class="metric-value">$252M</div>
+      <div class="metric-sub" style="color:var(--blue)">FCFマージン 33%</div>
+    </div>
+    <div class="metric-card" style="border-left-color:var(--red)">
+      <div class="metric-label">株価反応</div>
+      <div class="metric-value">▼下落</div>
+      <div class="metric-sub" style="color:var(--red)">FY27 9%成長ガイドが重し</div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('概要')">概要</button>
+  <button class="tab-btn" onclick="switchTab('収益性')">収益性</button>
+  <button class="tab-btn" onclick="switchTab('キャッシュフロー')">キャッシュフロー</button>
+  <button class="tab-btn" onclick="switchTab('SaaS KPI')">SaaS KPI</button>
+  <button class="tab-btn" onclick="switchTab('定性分析')">定性分析</button>
+  <button class="tab-btn" onclick="switchTab('バリュエーション')">バリュエーション</button>
+</div>
+
+<div class="content">
+
+<!-- ===== 概要 ===== -->
+<div id="tab-概要" class="tab-panel active">
+  <div class="section-header"><span>📊 売上高 推移（直近7四半期）</span></div>
+  <div class="card">
+    <canvas id="revenueChart"></canvas>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;font-size:11px;color:var(--gray)">
+      <span>Q2 FY25: <strong>$646M</strong> <span style="color:var(--yellow)">(+16%)</span></span>
+      <span>Q3 FY25: <strong>$660M</strong> <span style="color:var(--yellow)">(+14%)</span></span>
+      <span>Q4 FY25: <strong>$682M</strong> <span style="color:var(--yellow)">(+13%)</span></span>
+      <span>Q1 FY26: <strong>$688M</strong> <span style="color:var(--yellow)">(+12%)</span></span>
+      <span>Q2 FY26: <strong>$728M</strong> <span style="color:var(--yellow)">(+13%)</span></span>
+      <span>Q3 FY26: <strong>$742M</strong> <span style="color:var(--yellow)">(+12%)</span></span>
+      <span>Q4 FY26: <strong style="color:var(--green)">$761M</strong> <span style="color:var(--green)">(+11.6%)</span></span>
+    </div>
+  </div>
+
+  <div class="section-header"><span>💰 EPS 推移（直近7四半期）</span></div>
+  <div class="card">
+    <canvas id="epsChart"></canvas>
+  </div>
+
+  <div class="section-header"><span>🎯 コンセンサス比較</span></div>
+  <div class="flex-wrap">
+    <div class="beat-card" style="border-top:2px solid var(--green)">
+      <div class="beat-label">売上高</div>
+      <div class="beat-actual">$761M</div>
+      <div class="beat-consensus">予想: $749M</div>
+      <div class="beat-diff" style="color:var(--green)">▲ +$12M (+1.6%) Beat</div>
+    </div>
+    <div class="beat-card" style="border-top:2px solid var(--green)">
+      <div class="beat-label">Non-GAAP EPS</div>
+      <div class="beat-actual">$0.90</div>
+      <div class="beat-consensus">予想: $0.85</div>
+      <div class="beat-diff" style="color:var(--green)">▲ +$0.05 (+5.9%) Beat</div>
+    </div>
+    <div class="beat-card" style="border-top:2px solid var(--green)">
+      <div class="beat-label">cRPO (Q4実績)</div>
+      <div class="beat-actual">$2.513B</div>
+      <div class="beat-consensus">ガイド: $2.445-2.450B</div>
+      <div class="beat-diff" style="color:var(--green)">▲ +$65M 大幅超過</div>
+    </div>
+    <div class="beat-card" style="border-top:2px solid var(--red)">
+      <div class="beat-label">Q1 FY27 売上ガイダンス</div>
+      <div class="beat-actual">$749-753M</div>
+      <div class="beat-consensus">コンセンサス: $755M</div>
+      <div class="beat-diff" style="color:var(--red)">▼ -$3M ミス</div>
+    </div>
+    <div class="beat-card" style="border-top:2px solid var(--yellow)">
+      <div class="beat-label">FY27 売上ガイダンス</div>
+      <div class="beat-actual">$3.17-3.19B</div>
+      <div class="beat-consensus">コンセンサス: $3.17B</div>
+      <div class="beat-diff" style="color:var(--yellow)">→ インライン（9%成長）</div>
+    </div>
+  </div>
+
+  <div class="section-header"><span>📋 FY27ガイダンス vs コンセンサス</span></div>
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>指標</th>
+          <th>会社ガイダンス</th>
+          <th>コンセンサス</th>
+          <th>差分</th>
+          <th>評価</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td style="color:var(--white);font-weight:500">Q1 FY27 売上高</td>
+          <td style="color:var(--white)">$749-753M</td>
+          <td style="color:var(--gray)">$755M</td>
+          <td style="color:var(--red)">-$3M</td>
+          <td style="color:var(--red)">❌ ミス</td>
+        </tr>
+        <tr>
+          <td style="color:var(--white);font-weight:500">Q1 FY27 Non-GAAP EPS</td>
+          <td style="color:var(--white)">$0.84-0.86</td>
+          <td style="color:var(--gray)">$0.87</td>
+          <td style="color:var(--yellow)">-$0.01</td>
+          <td style="color:var(--yellow)">⚠️ 僅かにミス</td>
+        </tr>
+        <tr>
+          <td style="color:var(--white);font-weight:500">FY27 売上高</td>
+          <td style="color:var(--white)">$3.17-3.19B (9%成長)</td>
+          <td style="color:var(--gray)">$3.17B</td>
+          <td style="color:var(--yellow)">ほぼ一致</td>
+          <td style="color:var(--green)">✅ インライン</td>
+        </tr>
+        <tr>
+          <td style="color:var(--white);font-weight:500">FY27 Non-GAAP Op.Margin</td>
+          <td style="color:var(--white)">~24%</td>
+          <td style="color:var(--gray)">~25%</td>
+          <td style="color:var(--yellow)">-1pp</td>
+          <td style="color:var(--yellow)">⚠️ 僅かに下回る</td>
+        </tr>
+        <tr>
+          <td style="color:var(--white);font-weight:500">FY27 FCFマージン</td>
+          <td style="color:var(--white)">~29%</td>
+          <td style="color:var(--gray)">~30%</td>
+          <td style="color:var(--green)">ほぼ一致</td>
+          <td style="color:var(--green)">✅ インライン</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="info-box" style="background:#0D1520;color:var(--gray)">
+      ⚠️ FY27売上成長率9%はIPO以来最低水準。管理職は「慎重なアプローチ（prudent approach）」を継続と言及。市場はこの弱いフォワードガイダンスを嫌気し株価は下落。
+    </div>
+  </div>
+</div>
+
+<!-- ===== 収益性 ===== -->
+<div id="tab-収益性" class="tab-panel">
+  <div class="section-header"><span>📈 利益率トレンド（Q4 FY2026 vs Q4 FY2025）</span></div>
+  <div class="grid-3">
+    <div class="card">
+      <div style="color:var(--white);font-weight:700;margin-bottom:14px">粗利益率</div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--gray);font-size:12px">GAAP</span><span style="color:var(--green);font-size:12px;font-weight:600">+2.6pp YoY</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--white);font-size:20px;font-weight:700">77.9%</span><span style="color:var(--gray);font-size:13px">前年: 75.3%</span></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--gray);font-size:12px">Non-GAAP</span><span style="color:var(--green);font-size:12px;font-weight:600">+2pp YoY</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--white);font-size:20px;font-weight:700">~79%</span><span style="color:var(--gray);font-size:13px">前年: ~77%</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="color:var(--white);font-weight:700;margin-bottom:14px">営業利益率</div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--gray);font-size:12px">GAAP</span><span style="color:var(--green);font-size:12px;font-weight:600">+5pp YoY</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--white);font-size:20px;font-weight:700">6%</span><span style="color:var(--gray);font-size:13px">前年: 1%</span></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--gray);font-size:12px">Non-GAAP</span><span style="color:var(--green);font-size:12px;font-weight:600">+1pp YoY</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--white);font-size:20px;font-weight:700">26%</span><span style="color:var(--gray);font-size:13px">前年: 25%</span></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="color:var(--white);font-weight:700;margin-bottom:14px">純利益</div>
+      <div style="margin-bottom:12px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--gray);font-size:12px">GAAP 純利益</span><span style="color:var(--green);font-size:12px;font-weight:600">+174% YoY</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--white);font-size:20px;font-weight:700">$63M</span><span style="color:var(--gray);font-size:13px">前年: $23M</span></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="color:var(--gray);font-size:12px">Non-GAAP 純利益</span><span style="color:var(--green);font-size:12px;font-weight:600">+18% YoY</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:var(--white);font-size:20px;font-weight:700">$167M</span><span style="color:var(--gray);font-size:13px">前年: $141M</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header"><span>📊 通期FY2026サマリー</span></div>
+  <div class="card">
+    <div class="grid-3">
+      <div style="border-left:3px solid var(--green);padding-left:14px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:4px">FY26 総売上</div>
+        <div style="color:var(--white);font-weight:700;font-size:22px">$2.919B</div>
+        <div style="color:var(--green);font-size:12px;margin-top:2px">+12% YoY</div>
+      </div>
+      <div style="border-left:3px solid var(--green);padding-left:14px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:4px">FY26 サブスク売上</div>
+        <div style="color:var(--white);font-weight:700;font-size:22px">$2.855B</div>
+        <div style="color:var(--green);font-size:12px;margin-top:2px">+12% YoY (98%構成)</div>
+      </div>
+      <div style="border-left:3px solid var(--green);padding-left:14px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:4px">FY26 Non-GAAP 営業利益</div>
+        <div style="color:var(--white);font-weight:700;font-size:22px">$766M</div>
+        <div style="color:var(--green);font-size:12px;margin-top:2px">26% マージン (+4pp)</div>
+      </div>
+      <div style="border-left:3px solid var(--green);padding-left:14px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:4px">FY26 GAAP 純利益</div>
+        <div style="color:var(--white);font-weight:700;font-size:22px">$235M</div>
+        <div style="color:var(--green);font-size:12px;margin-top:2px">前年$28M → 大幅改善</div>
+      </div>
+      <div style="border-left:3px solid var(--green);padding-left:14px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:4px">FY26 Non-GAAP EPS</div>
+        <div style="color:var(--white);font-weight:700;font-size:22px">$3.50</div>
+        <div style="color:var(--green);font-size:12px;margin-top:2px">前年$2.81 (+24.6%)</div>
+      </div>
+      <div style="border-left:3px solid var(--blue);padding-left:14px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:4px">FY26 GAAP 営業利益</div>
+        <div style="color:var(--white);font-weight:700;font-size:22px">$149M</div>
+        <div style="color:var(--blue);font-size:12px;margin-top:2px">5% マージン (+8pp)</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header"><span>📦 売上構成（Q4 FY2026）</span></div>
+  <div class="flex-wrap">
+    <div class="card2 flex-1" style="border-left:3px solid var(--green)">
+      <div style="color:var(--gray);font-size:12px;margin-bottom:6px">サブスクリプション</div>
+      <div style="color:var(--white);font-weight:700;font-size:22px">~$749M</div>
+      <div style="display:flex;gap:16px;margin-top:6px">
+        <span style="color:var(--gray);font-size:12px">構成比: <strong style="color:var(--white)">98%</strong></span>
+        <span style="color:var(--green);font-size:12px">YoY: +12%</span>
+      </div>
+    </div>
+    <div class="card2 flex-1" style="border-left:3px solid var(--yellow)">
+      <div style="color:var(--gray);font-size:12px;margin-bottom:6px">プロフェッショナルサービス</div>
+      <div style="color:var(--white);font-weight:700;font-size:22px">~$12M</div>
+      <div style="display:flex;gap:16px;margin-top:6px">
+        <span style="color:var(--gray);font-size:12px">構成比: <strong style="color:var(--white)">2%</strong></span>
+        <span style="color:var(--yellow);font-size:12px">パートナーへ移管中</span>
+      </div>
+    </div>
+  </div>
+  <div class="info-box" style="background:#0D1520;color:var(--gray)">
+    📌 プロサービスは意図的にパートナーへ移管中。これがトータル売上成長率に対し約<strong style="color:var(--white)">1pp</strong>の逆風となっている。長期的には高マージンのサブスク比率向上につながる戦略。
+  </div>
+</div>
+
+<!-- ===== キャッシュフロー ===== -->
+<div id="tab-キャッシュフロー" class="tab-panel">
+  <div class="section-header"><span>💵 キャッシュフロー（Q4 FY2026）</span></div>
+  <div class="grid-3">
+    <div class="card">
+      <div style="color:var(--gray);font-size:12px;margin-bottom:6px">営業CF</div>
+      <div style="color:var(--white);font-weight:700;font-size:22px">+$258M</div>
+      <div style="color:var(--yellow);font-size:12px;margin-top:4px">マージン 34% | YoY -9.8%</div>
+      <div style="color:var(--gray);font-size:11px;margin-top:4px">前年: $286M (42%マージン)</div>
+    </div>
+    <div class="card">
+      <div style="color:var(--gray);font-size:12px;margin-bottom:6px">FCF（フリーキャッシュフロー）</div>
+      <div style="color:var(--white);font-weight:700;font-size:22px">+$252M</div>
+      <div style="color:var(--yellow);font-size:12px;margin-top:4px">マージン 33% | YoY -11%</div>
+      <div style="color:var(--gray);font-size:11px;margin-top:4px">前年: $284M (42%マージン)</div>
+    </div>
+    <div class="card">
+      <div style="color:var(--gray);font-size:12px;margin-bottom:6px">現金・短期投資（期末）</div>
+      <div style="color:var(--white);font-weight:700;font-size:22px">$2.553B</div>
+      <div style="color:var(--green);font-size:12px;margin-top:4px">前年比 +$30M</div>
+      <div style="color:var(--gray);font-size:11px;margin-top:4px">前年: $2.523B</div>
+    </div>
+  </div>
+
+  <div class="info-box" style="background:var(--card2);border-left:3px solid var(--yellow);margin-bottom:24px;padding:14px 18px">
+    <div style="color:var(--yellow);font-size:13px;font-weight:700;margin-bottom:6px">⚠️ FCFマージンの低下に注意</div>
+    <div style="color:var(--gray);font-size:12px;line-height:1.7">
+      FCFマージンがQ4 FY25の42%からQ4 FY26の33%へと大幅低下。主因は①2026年転換社債の現金決済、②自社株買いプログラム開始（$1B枠）、③低金利環境による利息収入減少。これら3要因で約1pp程度の影響。FY27ガイダンスではFCFマージン約29%を予想。
+    </div>
+  </div>
+
+  <div class="section-header"><span>🔄 通期FY2026 キャッシュフロー</span></div>
+  <div class="card">
+    <div class="grid-3">
+      <div style="text-align:center;padding:16px;background:var(--card2);border-radius:10px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:8px">FY26 営業CF</div>
+        <div style="color:var(--white);font-size:26px;font-weight:700">$884M</div>
+        <div style="color:var(--green);font-size:12px;margin-top:4px">30% マージン</div>
+        <div style="color:var(--gray);font-size:11px;margin-top:4px">前年$750M (+18%)</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:var(--card2);border-radius:10px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:8px">FY26 FCF</div>
+        <div style="color:var(--white);font-size:26px;font-weight:700">~$847M</div>
+        <div style="color:var(--green);font-size:12px;margin-top:4px">~29% マージン</div>
+        <div style="color:var(--gray);font-size:11px;margin-top:4px">前年~$729M</div>
+      </div>
+      <div style="text-align:center;padding:16px;background:var(--card2);border-radius:10px">
+        <div style="color:var(--gray);font-size:11px;margin-bottom:8px">自社株買い枠</div>
+        <div style="color:var(--white);font-size:26px;font-weight:700">$1B</div>
+        <div style="color:var(--blue);font-size:12px;margin-top:4px">2026年1月承認</div>
+        <div style="color:var(--gray);font-size:11px;margin-top:4px">株主還元強化</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SaaS KPI ===== -->
+<div id="tab-SaaS KPI" class="tab-panel">
+  <div class="section-header"><span>📐 Rule of 40</span></div>
+  <div class="card" style="margin-bottom:24px">
+    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+      <div style="text-align:center">
+        <svg width="130" height="130" viewBox="0 0 130 130">
+          <circle cx="65" cy="65" r="55" fill="none" stroke="#1E2E40" stroke-width="12"/>
+          <circle cx="65" cy="65" r="55" fill="none" stroke="#00C896" stroke-width="12"
+            stroke-dasharray="346.36" stroke-dashoffset="215.7"
+            transform="rotate(-90 65 65)"/>
+          <text x="65" y="60" text-anchor="middle" fill="#E8EFF7" font-size="22" font-weight="900" font-family="Noto Sans JP">37.6</text>
+          <text x="65" y="80" text-anchor="middle" fill="#00C896" font-size="11" font-family="Noto Sans JP">Rule of 40</text>
+        </svg>
+        <div style="color:var(--yellow);font-size:12px;margin-top:4px">⚠️ 40未満（基準ギリギリ）</div>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div style="display:flex;gap:16px;margin-bottom:16px">
+          <div class="card2" style="flex:1">
+            <div style="color:var(--gray);font-size:11px">売上成長率 (YoY)</div>
+            <div style="color:var(--white);font-weight:700;font-size:20px">11.6%</div>
+          </div>
+          <div class="card2" style="flex:1">
+            <div style="color:var(--gray);font-size:11px">Non-GAAP営業利益率</div>
+            <div style="color:var(--white);font-weight:700;font-size:20px">26%</div>
+          </div>
+        </div>
+        <div style="color:var(--gray);font-size:12px;line-height:1.7">
+          FY25: 約38% → FY26 Q4: 37.6%。成長鈍化により40を下回る水準で推移。FY27では9%成長 × ~24%マージン = <strong style="color:var(--red)">約33%</strong>に低下する見込み。SaaS指標として要注意。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header"><span>🔁 NRR / ARR / RPO</span></div>
+  <div class="grid-3" style="margin-bottom:24px">
+    <div class="card" style="border-top:2px solid var(--yellow)">
+      <div style="color:var(--gray);font-size:11px;margin-bottom:6px">NRR（Net Revenue Retention）</div>
+      <div style="color:var(--white);font-weight:800;font-size:28px">~106%</div>
+      <div style="color:var(--yellow);font-size:11px;margin-top:6px;line-height:1.5">Q3と同水準（想定内の範囲）。グロスリテンション高水準維持。NRR向上が今後の成長加速の鍵。</div>
+    </div>
+    <div class="card" style="border-top:2px solid var(--green)">
+      <div style="color:var(--gray);font-size:11px;margin-bottom:6px">RPO（残存履行義務）</div>
+      <div style="color:var(--white);font-weight:800;font-size:28px">$4.827B</div>
+      <div style="color:var(--green);font-size:11px;margin-top:6px;line-height:1.5">+15% YoY (Q3: +17%からやや鈍化するも健全水準)</div>
+    </div>
+    <div class="card" style="border-top:2px solid var(--green)">
+      <div style="color:var(--gray);font-size:11px;margin-bottom:6px">cRPO（12ヶ月以内）</div>
+      <div style="color:var(--white);font-weight:800;font-size:28px">$2.513B</div>
+      <div style="color:var(--green);font-size:11px;margin-top:6px;line-height:1.5">+12% YoY ガイド+9%を大幅超過。需要堅調の最重要シグナル。</div>
+    </div>
+  </div>
+
+  <div class="section-header"><span>👥 顧客指標</span></div>
+  <div class="flex-wrap">
+    <div class="card2 flex-1">
+      <div style="color:var(--gray);font-size:11px">総顧客数</div>
+      <div style="color:var(--white);font-weight:700;font-size:22px;margin-top:4px">20,000+</div>
+      <div style="color:var(--green);font-size:12px;margin-top:4px">継続的に拡大</div>
+    </div>
+    <div class="card2 flex-1">
+      <div style="color:var(--gray);font-size:11px">$100K+ ACV顧客</div>
+      <div style="color:var(--white);font-weight:700;font-size:22px;margin-top:4px">5,100+</div>
+      <div style="color:var(--green);font-size:12px;margin-top:4px">+7% YoY（Q3: 5,030）</div>
+    </div>
+    <div class="card2 flex-1">
+      <div style="color:var(--gray);font-size:11px">ARR（概算）</div>
+      <div style="color:var(--white);font-weight:700;font-size:22px;margin-top:4px">~$3.0B</div>
+      <div style="color:var(--blue);font-size:12px;margin-top:4px">サブスク売上$2.855B/年ベース</div>
+    </div>
+    <div class="card2 flex-1">
+      <div style="color:var(--gray);font-size:11px">主力新製品</div>
+      <div style="color:var(--white);font-weight:700;font-size:14px;margin-top:4px">OIG / PAM / ISPM</div>
+      <div style="color:var(--blue);font-size:12px;margin-top:4px">Auth0 for AI Agents まもなくGA</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 定性分析 ===== -->
+<div id="tab-定性分析" class="tab-panel">
+  <div class="section-header"><span>💬 経営陣コメントのハイライト</span></div>
+  <div class="card">
+    <div style="border-left:3px solid var(--blue);padding-left:16px;margin-bottom:20px">
+      <div style="color:var(--blue);font-size:12px;margin-bottom:6px">🎙️ Todd McKinnon（CEO）— キーメッセージ</div>
+      <div style="color:var(--white);font-size:13px;line-height:1.8">「AIが企業ソフトウェアの未来を再定義し、AIエージェントのセキュリティへの重大なニーズを生み出している。唯一の中立的なアイデンティティプラットフォームとして、人間からAIエージェントまで全アイデンティティを保護できる立場にある。今年度の強力なパフォーマンスは世界最大の組織からの信頼と新製品の加速的な採用によって支えられた。」</div>
+    </div>
+
+    <div style="color:var(--white);font-weight:700;margin-bottom:12px">📞 カンファレンスコール 重要発言</div>
+
+    <div class="comment-item" style="border-left:3px solid var(--green)">
+      <div class="comment-tags">
+        <span class="tag" style="background:#00C89620;color:var(--green)">ポジティブ</span>
+        <span class="speaker">Todd McKinnon（CEO）</span>
+      </div>
+      <div class="comment-text">「AIエージェントが組織の働き方を再定義している。人間とAIエージェントを含む全アイデンティティを保護する中立プラットフォームとして我々は最もよく位置付けられている。Okta Showcase 2026（3/16）でAI中心の製品をさらに発表する予定であり、アイデンティティセキュリティ市場の勝者として成長機会は非常に大きい。」</div>
+    </div>
+
+    <div class="comment-item" style="border-left:3px solid var(--yellow)">
+      <div class="comment-tags">
+        <span class="tag" style="background:#FFB80020;color:var(--yellow)">注意</span>
+        <span class="speaker">Brett Tighe（CFO）</span>
+      </div>
+      <div class="comment-text">「FY27においても引き続き市場環境を考慮した『慎重なアプローチ（prudent approach）』を適用する。FCFマージンは自社株買いプログラムと2026年転換社債の現金決済、および金利環境の影響で約1pp程度低下する見込み。Q1 FY27のNon-GAAPオペマージンはFQ26の26%から23-24%に一時的に低下するが、FY27通期では24-25%水準を目指す。」</div>
+    </div>
+
+    <div class="comment-item" style="border-left:3px solid var(--blue)">
+      <div class="comment-tags">
+        <span class="tag" style="background:#4DA6FF20;color:var(--blue)">注目</span>
+        <span class="speaker">Todd McKinnon（CEO）</span>
+      </div>
+      <div class="comment-text">「Auth0 for AI Agents（Auth for GenAI）がまもなく一般提供（GA）となる。MCP認証（OAuth for MCP）への需要も開発者エコシステムから確認されており、AIエージェントワークフロー向けのセキュリティソリューションへの問い合わせが加速している。人間に対するNHI（非人間アイデンティティ）の比率は144:1まで拡大しており、この市場機会は莫大。」</div>
+    </div>
+
+    <div class="comment-item" style="border-left:3px solid var(--yellow)">
+      <div class="comment-tags">
+        <span class="tag" style="background:#FFB80020;color:var(--yellow)">戦略</span>
+        <span class="speaker">Brett Tighe（CFO）</span>
+      </div>
+      <div class="comment-text">「プロサービスのパートナーへの移管加速が売上成長率に約1ppの逆風。これはFY27にも継続する意図的な戦略。長期的には高マージンのサブスクリプション比率向上、パートナーエコシステムの拡充につながる。大手エンタープライズでの統合プラットフォーム採用（例：50社のアイデンティティベンダーをOktaに統合）が加速。」</div>
+    </div>
+
+    <div class="comment-item" style="border-left:3px solid var(--red)">
+      <div class="comment-tags">
+        <span class="tag" style="background:#FF4D6A20;color:var(--red)">リスク</span>
+        <span class="speaker">経営陣総評</span>
+      </div>
+      <div class="comment-text">「FY26通期でガイダンスを3回上方修正した後、FY27は9%成長スタート。これはIPO以来の最低成長率ガイダンスであり、市場は再加速期待との乖離をネガティブに受け止めた。ただし管理職は『macro prudence（マクロ慎重姿勢）』を明示しており、FY26同様に実績で保守ガイダンスを上回る可能性も残る。」</div>
+    </div>
+  </div>
+
+  <div class="section-header"><span>⚠️ リスク・注目ポイント / カタリスト</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px">
+    <div class="card">
+      <div style="color:var(--red);font-weight:700;margin-bottom:12px">🔴 リスク要因</div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--red)">▸</span><span>FY27 9%成長ガイダンス — IPO以来の最低水準、再加速不透明</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--red)">▸</span><span>非GAAPオペマージン~24%への低下（FY26: 26%）</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--red)">▸</span><span>FCFマージン低下継続（33%→29%）：転換社債・自社株買いの影響</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--red)">▸</span><span>AI開発ツール普及でサイバーセキュリティ競合激化（Anthropicツール等への懸念）</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--red)">▸</span><span>マクロ不透明感：連邦政府顧客依存とDOGE関連支出削減リスク</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--red)">▸</span><span>NRR ~106%の継続的圧迫 — 拡張売上の伸び悩み</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--red)">▸</span><span>プロサービス縮小が短期的な売上ヘッドウィンド（~1pp）</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--red)">▸</span><span>株価年初来-17%でセンチメント低迷継続</span></div>
+    </div>
+    <div class="card">
+      <div style="color:var(--green);font-weight:700;margin-bottom:12px">🟢 ポジティブカタリスト</div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--green)">▸</span><span>AIエージェントセキュリティ市場の爆発的成長（NHI比率144:1）</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--green)">▸</span><span>Auth0 for AI Agents / Auth for GenAI まもなくGA</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--green)">▸</span><span>Okta Showcase 2026（3/16）での新製品・AI戦略発表</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--green)">▸</span><span>cRPO +12%（ガイド+9%大幅超過）— 需要堅調の最強シグナル</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--green)">▸</span><span>RPO +15% YoY — 中長期収益視認性高い</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--green)">▸</span><span>自社株買い$1B枠（株主還元強化・バリュエーション下支え）</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--green)">▸</span><span>OIG・PAM・ISPM等新製品群の継続的採用拡大</span></div>
+      <div class="risk-item"><span class="risk-bullet" style="color:var(--green)">▸</span><span>50ベンダー→Okta1社への統合需要（プラットフォーム統合トレンド）</span></div>
+    </div>
+  </div>
+
+  <div class="section-header"><span>🔄 前回決算との比較サマリー</span></div>
+  <div class="card">
+    <div style="display:flex;gap:16px;margin-bottom:16px;flex-wrap:wrap">
+      <div class="card2" style="flex:1;min-width:140px;text-align:center;border:1px solid #00C89630">
+        <div style="font-size:28px">📈</div>
+        <div style="color:var(--gray);font-size:11px;margin-top:4px">前回 Q3 FY26</div>
+        <div style="color:var(--green);font-weight:700;font-size:20px">4 / 5</div>
+        <div style="color:var(--green);font-size:12px">良い決算</div>
+      </div>
+      <div class="card2" style="flex:1;min-width:140px;text-align:center;border:1px solid #FFB80030">
+        <div style="font-size:28px">⏸️</div>
+        <div style="color:var(--gray);font-size:11px;margin-top:4px">今回 Q4 FY26</div>
+        <div style="color:var(--yellow);font-weight:700;font-size:20px">3 / 5</div>
+        <div style="color:var(--yellow);font-size:12px">悪くない決算</div>
+      </div>
+      <div class="card2" style="flex:1;min-width:140px;text-align:center;border:1px solid #FFB80030">
+        <div style="font-size:28px">→</div>
+        <div style="color:var(--gray);font-size:11px;margin-top:4px">トレンド方向</div>
+        <div style="color:var(--yellow);font-weight:700;font-size:20px">横ばい〜</div>
+        <div style="color:var(--yellow);font-size:12px">やや悪化</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--gray);line-height:1.8">
+      <strong style="color:var(--white)">変化の主要因：</strong><br>
+      Q3は売上・EPS共にビートし株価も+1.96%上昇したが、Q4は同様のビートにも関わらずFY27ガイダンスが失望を招いた。成長率9%（IPO以来最低）と「慎重アプローチ」の継続が市場期待とのギャップを生んだ。ただし、cRPO +12%（ガイド超過）はポジティブサプライズであり、ファンダメンタルズ自体が大きく悪化したわけではない。株価は年初来-17%で既に多くのネガティブを織り込んでいたが、それでも市場は下落で反応。FY27のAIエージェント新製品GS（Okta Showcase 3/16）が次の注目材料。
+    </div>
+  </div>
+</div>
+
+<!-- ===== バリュエーション ===== -->
+<div id="tab-バリュエーション" class="tab-panel">
+  <div class="section-header"><span>💎 想定株価（3シナリオ）</span></div>
+  <div class="flex-wrap" style="margin-bottom:24px">
+    <div class="val-card flex-1" style="background:linear-gradient(135deg,#0D2010,#152810);border:1px solid #00A87860">
+      <div class="val-label" style="color:var(--green2)">LOW（保守的）</div>
+      <div class="val-target">$66</div>
+      <div class="val-judgment" style="color:var(--red)">▼ やや割高 (-8.3%)</div>
+      <div class="val-divider">
+        <div class="val-row"><span class="val-row-label">使用EPS</span><span class="val-row-value">$3.30</span></div>
+        <div class="val-row"><span class="val-row-label">適用PER</span><span class="val-row-value">20x</span></div>
+        <div class="val-row"><span class="val-row-label">現在株価</span><span class="val-row-value">~$72</span></div>
+      </div>
+      <div class="val-note">FY27ガイダンスEPS下端 $3.30<br>過去5年PER下限 ~20x</div>
+    </div>
+    <div class="val-card flex-1" style="background:linear-gradient(135deg,#0D1A30,#152040);border:1px solid #4DA6FF60;box-shadow:0 0 30px #4DA6FF30">
+      <div class="val-badge">ベースケース</div>
+      <div class="val-label" style="color:var(--blue)">MID（基本）</div>
+      <div class="val-target">$95</div>
+      <div class="val-judgment" style="color:var(--green)">▲ 割安 (+31.9%)</div>
+      <div class="val-divider">
+        <div class="val-row"><span class="val-row-label">使用EPS</span><span class="val-row-value">$3.50</span></div>
+        <div class="val-row"><span class="val-row-label">適用PER</span><span class="val-row-value">27x</span></div>
+        <div class="val-row"><span class="val-row-label">現在株価</span><span class="val-row-value">~$72</span></div>
+      </div>
+      <div class="val-note">FY27コンセンサスEPS ~$3.50<br>過去5年PER中央値 ~27x</div>
+    </div>
+    <div class="val-card flex-1" style="background:linear-gradient(135deg,#2D0D0D,#3A1010);border:1px solid #FF4D6A60">
+      <div class="val-label" style="color:var(--red)">HIGH（楽観的）</div>
+      <div class="val-target">$152</div>
+      <div class="val-judgment" style="color:var(--green)">▲ 大幅割安 (+111%)</div>
+      <div class="val-divider">
+        <div class="val-row"><span class="val-row-label">使用EPS</span><span class="val-row-value">$3.80</span></div>
+        <div class="val-row"><span class="val-row-label">適用PER</span><span class="val-row-value">40x</span></div>
+        <div class="val-row"><span class="val-row-label">現在株価</span><span class="val-row-value">~$72</span></div>
+      </div>
+      <div class="val-note">楽観EPS $3.80（AIエージェント普及加速）<br>過去5年PER上限 ~40x（成長再加速時）</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:24px">
+    <div style="color:var(--white);font-weight:700;margin-bottom:12px">📊 バリュエーション前提</div>
+    <div class="grid-3">
+      <div class="card2">
+        <div style="color:var(--gray);font-size:11px">現在株価（3/4終値前後）</div>
+        <div style="color:var(--white);font-weight:700;font-size:18px;margin-top:4px">~$72</div>
+      </div>
+      <div class="card2">
+        <div style="color:var(--gray);font-size:11px">FY27 Non-GAAP EPS（会社ガイド）</div>
+        <div style="color:var(--white);font-weight:700;font-size:18px;margin-top:4px">$3.30〜$3.50</div>
+      </div>
+      <div class="card2">
+        <div style="color:var(--gray);font-size:11px">Forward PER（現在株価ベース）</div>
+        <div style="color:var(--white);font-weight:700;font-size:18px;margin-top:4px">~20x〜22x</div>
+      </div>
+      <div class="card2">
+        <div style="color:var(--gray);font-size:11px">アナリスト平均目標株価</div>
+        <div style="color:var(--white);font-weight:700;font-size:18px;margin-top:4px">~$106.5</div>
+      </div>
+      <div class="card2">
+        <div style="color:var(--gray);font-size:11px">時価総額（概算）</div>
+        <div style="color:var(--white);font-weight:700;font-size:18px;margin-top:4px">~$12.5B</div>
+      </div>
+      <div class="card2">
+        <div style="color:var(--gray);font-size:11px">EV/FCF（FY26実績ベース）</div>
+        <div style="color:var(--white);font-weight:700;font-size:18px;margin-top:4px">~15x</div>
+      </div>
+    </div>
+    <div class="info-box" style="background:#0D1520;color:var(--gray)">
+      <strong style="color:var(--white)">📌 バリュエーション総括：</strong>
+      MIDシナリオ（$95）が示す通り、現在の株価$72は過去平均PER水準でみると割安感がある。ただし成長率9%はPEGレシオが2倍超となりグロース株としては割高とも解釈可能。AIエージェントセキュリティが成長再加速の実証材料となればマルチプル再評価の余地が大きい。自社株買い$1Bが下値支持材料。アナリスト中央値$106.5は現在株価比+48%を示す。
+    </div>
+  </div>
+
+  <div class="section-header"><span>📈 過去5年 PER レンジ</span></div>
+  <div class="card">
+    <div class="per-row">
+      <div class="per-item"><div class="per-label">過去5年 PER下限</div><div class="per-value" style="color:var(--green2)">~20x</div></div>
+      <div class="per-item"><div class="per-label">過去5年 PER中央値</div><div class="per-value" style="color:var(--blue)">~27x</div></div>
+      <div class="per-item"><div class="per-label">過去5年 PER上限</div><div class="per-value" style="color:var(--red)">~40x</div></div>
+      <div class="per-item"><div class="per-label">現在 Forward PER</div><div class="per-value" style="color:var(--yellow)">~20-22x</div></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /content -->
+
+<div class="footer">
+  Okta Q4 FY2026 決算分析レポート ｜ データソース: Okta IR, BusinessWire, CNBC, 各証券アナリストレポート ｜ 作成日: 2026年3月5日<br>
+  本レポートは情報提供目的のみ。投資判断は自己責任で行ってください。
+</div>
+
+<script>
+// Tab switching
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// Chart defaults
+Chart.defaults.color = '#8899AA';
+Chart.defaults.font.family = "'Noto Sans JP', sans-serif";
+
+// Revenue Chart
+const revCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Q2 FY25', 'Q3 FY25', 'Q4 FY25', 'Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26'],
+    datasets: [{
+      label: '売上高 ($M)',
+      data: [646, 660, 682, 688, 728, 742, 761],
+      backgroundColor: ['#2A4060','#2A4060','#2A4060','#2A4060','#2A4060','#2A4060','#00C896'],
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#1A2332',
+        borderColor: '#2A3545',
+        borderWidth: 1,
+        callbacks: {
+          label: (ctx) => ` $${ctx.parsed.y}M`
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: '#1E2E40' }, ticks: { color: '#8899AA' } },
+      y: { grid: { color: '#1E2E40' }, ticks: { color: '#8899AA', callback: v => `$${v}M` }, min: 500 }
+    }
+  }
+});
+
+// EPS Chart
+const epsCtx = document.getElementById('epsChart').getContext('2d');
+new Chart(epsCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Q2 FY25', 'Q3 FY25', 'Q4 FY25', 'Q1 FY26', 'Q2 FY26', 'Q3 FY26', 'Q4 FY26'],
+    datasets: [
+      {
+        label: 'GAAP EPS',
+        data: [0.09, 0.09, 0.13, 0.35, 0.23, 0.24, 0.35],
+        backgroundColor: '#2A5080',
+        borderRadius: [3, 3, 0, 0],
+      },
+      {
+        label: 'Non-GAAP EPS',
+        data: [0.72, 0.67, 0.78, 0.86, 0.91, 0.82, 0.90],
+        backgroundColor: ['#1A6040','#1A6040','#1A6040','#1A6040','#1A6040','#1A6040','#00C896'],
+        borderRadius: [3, 3, 0, 0],
+      }
+    ]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: true,
+    plugins: {
+      legend: { labels: { color: '#8899AA', font: { size: 11 } } },
+      tooltip: {
+        backgroundColor: '#1A2332',
+        borderColor: '#2A3545',
+        borderWidth: 1,
+        callbacks: {
+          label: (ctx) => ` ${ctx.dataset.label}: $${ctx.parsed.y}`
+        }
+      }
+    },
+    scales: {
+      x: { grid: { color: '#1E2E40' }, ticks: { color: '#8899AA' } },
+      y: { grid: { color: '#1E2E40' }, ticks: { color: '#8899AA', callback: v => `$${v}` } }
+    }
+  }
+});
+</script>
+</body>
+</html>
